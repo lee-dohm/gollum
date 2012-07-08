@@ -53,7 +53,7 @@ module Gollum
           raise "There was an error converting #{@name} to HTML."
         end
       rescue Object => e
-        data = %{<p class="gollum-error">#{e.message}</p>}
+        data = %{<p class="gollum-error">#{e.to_s}<br/>#{e.backtrace.join("<br/>")}</p>}
       end
       data = process_tags(data)
       data = process_code(data, encoding)
