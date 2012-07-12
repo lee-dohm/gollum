@@ -3,6 +3,7 @@ require 'sinatra'
 require 'gollum'
 require 'mustache/sinatra'
 require 'useragent'
+require 'stringex'
 
 require 'gollum/frontend/views/layout'
 require 'gollum/frontend/views/editable'
@@ -10,6 +11,16 @@ require 'gollum/frontend/views/has_page'
 
 require File.expand_path '../uri_encode_component', __FILE__
 require File.expand_path '../helpers', __FILE__
+
+# Fix to_url
+class String
+  alias :upstream_to_url :to_url
+  # _Header => header which causes errors
+  def to_url
+    return self if ['_Header', '_Footer', '_Sidebar'].include? self
+    upstream_to_url
+  end
+end
 
 # Run the frontend, based on Sinatra
 #
@@ -142,7 +153,7 @@ module Precious
     end
 
     post '/create' do
-      name         = params[:page]
+      name         = params[:page].to_url
       path         = sanitize_empty_params(params[:path])
       format       = params[:format].intern
 
