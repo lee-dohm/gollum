@@ -253,7 +253,7 @@ module Precious
       Gollum::Tex.render_formula(formula)
     end
 
-    get %r{^/(javascript|css|images)} do
+    get %r{^/(javascript|css)} do
       halt 404
     end
 
