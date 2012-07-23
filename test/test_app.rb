@@ -88,7 +88,7 @@ context "Frontend" do
       :rename => "C", :page => 'B',
       :format => page_1.format, :message => 'def'
     follow_redirect!
-    assert_equal "/C", last_request.fullpath
+    assert_equal '/c', last_request.fullpath
     assert last_response.ok?
 
     @wiki.clear_cache
@@ -151,6 +151,20 @@ context "Frontend" do
     @wiki.clear_cache
     page = @wiki.page(name)
     assert_not_equal 'abc', page.raw_data
+  end
+
+  test "delete a page" do
+    name = "deleteme"
+    post "/create", :content => 'abc', :page => name,
+      :format => 'markdown', :message => 'foo'
+    page = @wiki.page(name)
+    assert_equal 'abc', page.raw_data
+
+    get '/delete/' + name
+
+    @wiki.clear_cache
+    page = @wiki.page(name)
+    assert_equal nil, page
   end
 
   test "previews content" do
