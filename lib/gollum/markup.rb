@@ -125,12 +125,12 @@ module Gollum
     # Returns the placeholder'd String data.
     def extract_tex(data)
       data.gsub(/\\\[\s*(.*?)\s*\\\]/m) do
-        tag = CGI.escapeHTML($1)
+        tag = $1
         id  = Digest::SHA1.hexdigest(tag)
         @texmap[id] = [:block, tag]
         id
       end.gsub(/\\\(\s*(.*?)\s*\\\)/m) do
-        tag = CGI.escapeHTML($1)
+        tag = $1
         id  = Digest::SHA1.hexdigest(tag)
         @texmap[id] = [:inline, tag]
         id
