@@ -14,7 +14,6 @@ require File.expand_path '../helpers', __FILE__
 
 # Fix to_url
 class String
-  alias :upstream_to_url :to_url
   # _Header => header which causes errors
   def to_url
     return nil if self.nil?
