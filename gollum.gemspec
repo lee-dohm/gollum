@@ -6,7 +6,7 @@ Gem::Specification.new do |s|
 
   s.name              = 'gollum'
   s.version           = '2.1.0'
-  s.date              = '2012-07-14'
+  s.date              = '2012-08-01'
   s.rubyforge_project = 'gollum'
 
   s.summary     = "A simple, Git-powered wiki."
@@ -90,8 +90,9 @@ Gem::Specification.new do |s|
     lib/gollum/frontend/public/gollum/javascript/gollum.dialog.js
     lib/gollum/frontend/public/gollum/javascript/gollum.js
     lib/gollum/frontend/public/gollum/javascript/gollum.placeholder.js
+    lib/gollum/frontend/public/gollum/javascript/jquery-1.7.2.min.js
     lib/gollum/frontend/public/gollum/javascript/jquery.color.js
-    lib/gollum/frontend/public/gollum/javascript/jquery.js
+    lib/gollum/frontend/public/gollum/javascript/mousetrap.min.js
     lib/gollum/frontend/public/gollum/livepreview/css/custom.css
     lib/gollum/frontend/public/gollum/livepreview/images/cancel_24.png
     lib/gollum/frontend/public/gollum/livepreview/images/lr_24.png
@@ -410,11 +411,11 @@ Gem::Specification.new do |s|
     lib/gollum/frontend/public/gollum/livepreview/js/ace/lib/ace/worker/worker.js
     lib/gollum/frontend/public/gollum/livepreview/js/ace/lib/ace/worker/worker_client.js
     lib/gollum/frontend/public/gollum/livepreview/js/ace/lib/ace/worker/worker_sourcemint.js
-    lib/gollum/frontend/public/gollum/livepreview/js/debounce/jquery.ba-throttle-debounce.js
-    lib/gollum/frontend/public/gollum/livepreview/js/jquery/jquery-1.7.2.min.js
-    lib/gollum/frontend/public/gollum/livepreview/js/livepreview/livepreview.js
-    lib/gollum/frontend/public/gollum/livepreview/js/requirejs/require.js
-    lib/gollum/frontend/public/gollum/livepreview/js/sundown/sundown_o2_wo.js
+    lib/gollum/frontend/public/gollum/livepreview/js/jquery.ba-throttle-debounce.min.js
+    lib/gollum/frontend/public/gollum/livepreview/js/livepreview.js
+    lib/gollum/frontend/public/gollum/livepreview/js/md_sundown.js
+    lib/gollum/frontend/public/gollum/livepreview/js/requirejs.min.js
+    lib/gollum/frontend/public/gollum/livepreview/js/sundown.js
     lib/gollum/frontend/public/gollum/livepreview/licenses/ace/LICENSE.txt
     lib/gollum/frontend/public/gollum/livepreview/licenses/bootstraponline_gollum/LICENSE.txt
     lib/gollum/frontend/public/gollum/livepreview/licenses/debounce/LICENSE-MIT.txt
