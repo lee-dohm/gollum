@@ -167,7 +167,7 @@ module Precious
     end
 
     get '/create/*' do
-      splat = params[:splat].first
+      splat = CGI.unescape(params[:splat].first)
       wikip = wiki_page(extract_name(splat).to_url, splat)
       @name = wikip.name
       @path = wikip.path
