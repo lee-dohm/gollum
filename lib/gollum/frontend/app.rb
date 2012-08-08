@@ -89,12 +89,16 @@ module Precious
       show_page_or_file('Home')
     end
 
+    # path is set to name if path is nil.
+    #   if path is 'a/b' and a and b are dirs, then
+    #   path must have a trailing slash 'a/b/' or
+    #   extract_path will trim path to 'a'
     # name, path, version
     def wiki_page( name, path = nil, version = nil)
       path = name if path.nil?
-
       name = extract_name(name)
       path = extract_path(path)
+
       wiki = wiki_new
 
       OpenStruct.new(:wiki => wiki, :page => wiki.paged(name, path, version),
@@ -136,7 +140,7 @@ module Precious
     end
 
     post '/edit/*' do
-      wikip = wiki_page(CGI.unescape(params[:page]), sanitize_empty_params(params[:path]))
+      wikip        = wiki_page(CGI.unescape(params[:page]), sanitize_empty_params(params[:path]))
       path         = wikip.path
       wiki         = wikip.wiki
       page         = wikip.page
@@ -192,7 +196,7 @@ module Precious
       begin
         wiki.write_page(name, format, params[:content], commit_message)
         page = wiki.page(name)
-        redirect to("/#{page.escaped_url_path}")
+        redirect to("/#{page.escaped_url_path}") unless page.nil?
       rescue Gollum::DuplicatePageError => e
         @message = "Duplicate page: #{e.message}"
         mustache :error
@@ -284,10 +288,11 @@ module Precious
 
     get %r{/(.+?)/([0-9a-f]{40})} do
       file_path = params[:captures][0]
-      name      = extract_name(file_path)
-      path      = extract_path(file_path)
       version   = params[:captures][1]
-      if page = wiki_page(name, path, version).page
+      wikip     = wiki_page(file_path, file_path, version)
+      name      = wikip.name
+      path      = wikip.path
+      if page = wikip.page
         @page = page
         @name = name
         @content = page.formatted_data
