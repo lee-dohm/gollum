@@ -14,7 +14,6 @@ html, body {
 
 body {
   font: 13.34px helvetica,arial,freesans,clean,sans-serif;
-  line-height: 1.4;
 }
 
 img {
@@ -130,7 +129,7 @@ a.absent {
 .markdown-body li,
 .markdown-body table,
 .markdown-body pre {
-  margin: 15px 0;
+  margin: 10px 0;
 }
 .markdown-body hr {
   background: transparent url(../images/dirty-shade.png) repeat-x 0 0;
