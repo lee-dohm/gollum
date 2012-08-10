@@ -518,8 +518,8 @@ ul.actions {
   display: block;
   font-weight: bold;
   margin: 0;
-  padding: 0.4em 1em;
-  height: 1.4em;
+  padding: 0.6em 1em 0.4em 1em;
+  height: 1.2em;
 
   text-shadow: 0 1px 0 #fff;
 
