@@ -52,7 +52,7 @@ module Gollum
       data = extract_wsd(data)
       data = extract_tags(data)
       begin
-        data = "__NOTOC__\n" + data unless @wiki.universal_toc
+        data = "__NOTOC__\n" + data if @name =~ /\.(media)?wiki$/ && !@wiki.universal_toc
         data = GitHub::Markup.render(@name, data)
         if data.nil?
           raise "There was an error converting #{@name} to HTML."
