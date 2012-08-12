@@ -35,8 +35,9 @@ a.absent {
 }
 
 .markdown-body {
-  font-size: 14px;
-  line-height: 1.6;
+  font-family: "Hoefler Text", Georgia, "Times Roman", "Times New Roman", serif;
+  font-size: 16px;
+  line-height: 1.4;
 }
 .markdown-body>*:first-child {
   margin-top: 0!important;
@@ -69,6 +70,7 @@ a.absent {
   -webkit-font-smoothing: antialiased;
   cursor: text;
   position: relative;
+  font-family: helvetica,arial,freesans,clean,sans-serif
 }
 .markdown-body h1:hover a.anchor,
 .markdown-body h2:hover a.anchor,
