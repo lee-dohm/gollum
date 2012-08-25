@@ -58,6 +58,10 @@ a.absent {
   left: 0;
   bottom: 0;
 }
+.markdown-body a[href^="http://"] {
+    background: url(../images/Icon_External_Link.svg) center right no-repeat;
+    padding-right: 13px;
+}
 .markdown-body h1,
 .markdown-body h2,
 .markdown-body h3,
