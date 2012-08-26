@@ -60,31 +60,38 @@ a.absent {
 }
 .markdown-body a[href^="http://"] {
     background: url(../images/Icon_External_Link.svg) center right no-repeat;
-    padding-right: 13px;
+    padding-right: 14px;
+    padding-top: 2px;
 }
 .markdown-body a[href^="https://"] {
     background: url(../images/Icon_External_Link_HTTPS.png) center right no-repeat;
     padding-right: 15px;    
+    padding-top: 2px;
 }
 .markdown-body a[href^="mailto:"] {
     background: url(../images/Icon_External_Link_E-Mail.png) center right no-repeat;
     padding-right: 16px;    
+    padding-top: 2px;
 }
 .markdown-body a[href^="ftp:"] {
     background: url(../images/Icon_External_Link_FTP.png) center right no-repeat;
     padding-right: 16px;    
+    padding-top: 2px;
 }
 .markdown-body a[href^="irc:"] {
     background: url(../images/Icon_External_Link_IRC.png) center right no-repeat;
     padding-right: 16px;    
+    padding-top: 2px;
 }
 .markdown-body a[href^="news:"] {
     background: url(../images/Icon_External_Link_Newsgroups.png) center right no-repeat;
     padding-right: 16px;    
+    padding-top: 2px;
 }
 .markdown-body a[href$=".pdf"] {
     background: url(../images/Icon_External_Link_PDF.png) center right no-repeat;
     padding-right: 16px;    
+    padding-top: 2px;
 }
 .markdown-body h1,
 .markdown-body h2,
