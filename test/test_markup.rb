@@ -1,4 +1,5 @@
-# ~*~ encoding: utf-8 ~*~
+#encoding: utf-8
+
 require File.expand_path(File.join(File.dirname(__FILE__), "helper"))
 
 context "Markup" do
@@ -670,26 +671,14 @@ end
 
   test "TeX block syntax" do
     content = 'a \[ a^2 \] b'
-    output = "<p>a<imgwidth=\"15\"height=\"16\"style=\"vertical-align:-1px;\"src=\"/_tex.png?type=block&data=YV4y\"alt=\"a^2\"/>b</p>"
+    output = "<p>a\\[a^2\\]b</p>"
     compare(content, output, 'md')
   end
 
   test "TeX inline syntax" do
     content = 'a \( a^2 \) b'
-    output = "<p>a<imgwidth=\"15\"height=\"16\"style=\"vertical-align:-1px;\"src=\"/_tex.png?type=inline&data=YV4y\"alt=\"a^2\"/>b</p>"
+    output = "<p>a\\(a^2\\)b</p>"
     compare(content, output, 'md')
-  end
-
-  #########################################################################
-  # Asciidoc
-  #########################################################################
-
-  test "asciidoc header" do 
-    compare("= Book Title\n\n== Heading", '<div class="sect1"><h2 id="wiki-_heading">Heading<a class="anchor" id="Heading" href="#Heading"></a></h2><div class="sectionbody"></div></div>', 'asciidoc')
-  end
-
-  test "internal links with asciidoc" do 
-    compare("= Book Title\n\n[[anid]]\n== Heading", '<div class="sect1"><h2 id="wiki-anid">Heading<a class="anchor" id="Heading" href="#Heading"></a></h2><div class="sectionbody"></div></div>', 'asciidoc')
   end
 
   #########################################################################
