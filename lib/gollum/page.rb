@@ -325,9 +325,9 @@ module Gollum
     #   # => 'Bilbo_Baggins'
     #
     # Returns the String canonical name.
-    def self.cname(name, char_white_sub = '-', char_other_sub = '-')
+    def self.cname(name, char_white_sub = '_', char_other_sub = '-')
       name.respond_to?(:gsub) ?
-        name.gsub(%r{\s},char_white_sub).gsub(%r{[/<>+]}, char_other_sub) :
+        name.gsub(%r{\s|\+}, char_white_sub).gsub(%r{[/<>]}, char_other_sub) :
         ''
     end
 

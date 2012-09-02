@@ -14,7 +14,7 @@ context "Page" do
   end
 
   test "get existing page" do
-    page = @wiki.page('Bilbo Baggins')
+    page = @wiki.page('Bilbo-Baggins')
     assert_equal Gollum::Page, page.class
     assert page.raw_data =~ /^# Bilbo Baggins\n\nBilbo Baggins/
     assert page.formatted_data =~ %r{<h1>Bilbo Baggins<a class="anchor" id="Bilbo-Baggins" href="#Bilbo-Baggins"></a>\n</h1>\n\n<p>Bilbo Baggins}
@@ -99,8 +99,8 @@ context "Page" do
 
   test "cname" do
     assert_equal "Foo", Gollum::Page.cname("Foo")
-    assert_equal "Foo-Bar", Gollum::Page.cname("Foo Bar")
-    assert_equal "Foo---Bar", Gollum::Page.cname("Foo / Bar")
+    assert_equal "Foo_Bar", Gollum::Page.cname("Foo Bar")
+    assert_equal "Foo_-_Bar", Gollum::Page.cname("Foo / Bar")
     assert_equal "José", Gollum::Page.cname("José")
     assert_equal "モルドール", Gollum::Page.cname("モルドール")
   end

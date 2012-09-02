@@ -168,7 +168,7 @@ context "Wiki page writing" do
   end
 
   test "is not allowed to overwrite file" do
-    @wiki.write_page("Abc-Def", :markdown, "# Gollum", commit_details)
+    @wiki.write_page("Abc_Def", :markdown, "# Gollum", commit_details)
     assert_raises Gollum::DuplicatePageError do
       @wiki.write_page("ABC DEF", :textile,  "# Gollum", commit_details)
     end
@@ -310,7 +310,7 @@ context "Wiki page writing with whitespace (filename contains whitespace)" do
     @wiki.update_page(page, 'Sam Gamgee', :textile, "h1. Samwise Gamgee", commit_details)
 
     assert_equal "h1. Samwise Gamgee", @wiki.page("Sam Gamgee").raw_data
-    assert_equal "Sam-Gamgee.textile", @wiki.page("Sam Gamgee").filename
+    assert_equal "Sam_Gamgee.textile", @wiki.page("Sam Gamgee").filename
   end
 
   test "update page with name and format change, verify canonicalization of filename, where filename contains Whitespace" do
@@ -322,7 +322,7 @@ context "Wiki page writing with whitespace (filename contains whitespace)" do
 
     assert_equal :textile, @wiki.page("Sam Gamgee").format
     assert_equal "h1. Samwise Gamgee", @wiki.page("Sam Gamgee").raw_data
-    assert_equal "Sam-Gamgee.textile", @wiki.page("Sam Gamgee").filename
+    assert_equal "Sam_Gamgee.textile", @wiki.page("Sam Gamgee").filename
   end
 
   teardown do

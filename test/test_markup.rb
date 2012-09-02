@@ -103,7 +103,7 @@ context "Markup" do
     page = @wiki.page("Bilbo Baggins")
     output = page.formatted_data
     assert_match /class="internal present"/, output
-    assert_match /href="\/Bilbo-Baggins"/,   output
+    assert_match /href="\/Bilbo_Baggins"/,   output
     assert_match /\>Bilbo Baggins\</,        output
   end
 
@@ -123,7 +123,7 @@ context "Markup" do
     page = @wiki.page("Tolkien")
     output = page.formatted_data
     assert_match /class="internal absent"/,         output
-    assert_match /href="\/J\.\-R\.\-R\.\-Tolkien"/, output
+    assert_match /href="\/J\._R\._R\._Tolkien"/, output
     assert_match /\>J\. R\. R\. Tolkien\</,         output
   end
 
@@ -136,7 +136,7 @@ context "Markup" do
       page = @wiki.page(name)
       output = page.formatted_data
       assert_match /class="internal present"/,        output
-      assert_match /href="\/wiki\/Bilbo-Baggins-\d"/, output
+      assert_match /href="\/wiki\/Bilbo_Baggins_\d"/, output
       assert_match /\>Bilbo Baggins \d\</,            output
     end
   end
@@ -146,7 +146,7 @@ context "Markup" do
     page   = @wiki.page('Precious #1')
     output = page.formatted_data
     assert_match /class="internal present"/, output
-    assert_match /href="\/Precious-%231"/,   output
+    assert_match /href="\/Precious_%231"/,   output
   end
 
   test "page link with extra #" do
