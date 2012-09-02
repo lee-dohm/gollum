@@ -289,7 +289,7 @@ context "Frontend with lotr" do
   # Here's the dir structure of lotr.git
   #
   # .
-  # ├── Bilbo-Baggins.md
+  # ├── Bilbo_Baggins.md
   # ├── Data.csv
   # ├── Gondor
   # │   ├── Boromir.md

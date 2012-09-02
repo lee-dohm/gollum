@@ -14,11 +14,11 @@ context "Page" do
   end
 
   test "get existing page" do
-    page = @wiki.page('Bilbo-Baggins')
+    page = @wiki.page('Bilbo_Baggins')
     assert_equal Gollum::Page, page.class
     assert page.raw_data =~ /^# Bilbo Baggins\n\nBilbo Baggins/
     assert page.formatted_data =~ %r{<h1>Bilbo Baggins<a class="anchor" id="Bilbo-Baggins" href="#Bilbo-Baggins"></a>\n</h1>\n\n<p>Bilbo Baggins}
-    assert_equal 'Bilbo-Baggins.md', page.path
+    assert_equal 'Bilbo_Baggins.md', page.path
     assert_equal :markdown, page.format
     assert_equal @wiki.repo.commits.first.id, page.version.id
   end
@@ -32,7 +32,7 @@ context "Page" do
   end
 
   test "get existing page with underscore" do
-    assert_nil @wiki.page('Bilbo_Baggins')
+    assert_equal @wiki.page('Bilbo Baggins').path, @wiki.page('Bilbo_Baggins').path
   end
 
   test "get existing page where filename contains whitespace, with hypen" do
@@ -54,7 +54,7 @@ context "Page" do
 
   test "url_path" do
     page = @wiki.page('Bilbo Baggins')
-    assert_equal 'Bilbo-Baggins', page.url_path
+    assert_equal 'Bilbo_Baggins', page.url_path
   end
 
   test "nested url_path" do
@@ -64,7 +64,7 @@ context "Page" do
 
   test "page versions" do
     page = @wiki.page('Bilbo Baggins')
-    assert_equal ["f25eccd98e9b667f9e22946f3e2f945378b8a72d", "5bc1aaec6149e854078f1d0f8b71933bbc6c2e43"],
+    assert_equal ["2659b3ace3af20a7e65e1ce973079f3e3e45d3b9"],
       page.versions.map { |v| v.id }
   end
 
