@@ -163,7 +163,7 @@ module Gollum
         ''
       end
 
-      path << Page.cname(self.name, '-', '-')
+      path << Page.cname(self.name)
       path
     end
 
