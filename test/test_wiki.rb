@@ -1,4 +1,3 @@
-# ~*~ encoding: utf-8 ~*~
 require File.expand_path(File.join(File.dirname(__FILE__), "helper"))
 
 context "Wiki" do
@@ -54,7 +53,7 @@ context "Wiki" do
   test "list pages" do
     pages = @wiki.pages
     assert_equal \
-      ['Bilbo_Baggins.md', 'Boromir.md', 'Elrond.md', 'Eye-Of-Sauron.md', 'Home.textile', 'My-Precious.md', 'Samwise Gamgee.mediawiki'],
+      ['Bilbo_Baggins.md', 'Boromir.md', 'Elrond.md', 'Eye_Of_Sauron.md', 'Home.textile', 'My-Precious.md', 'Samwise Gamgee.mediawiki'],
       pages.map { |p| p.filename }.sort
   end
 
@@ -339,45 +338,45 @@ context "Wiki sync with working directory" do
 
   test "write a page" do
     @wiki.write_page("New Page", :markdown, "Hi", commit_details)
-    assert_equal "Hi", File.read(File.join(@path, "New-Page.md"))
+    assert_equal "Hi", File.read(File.join(@path, "New_Page.md"))
   end
 
   test "update a page with same name and format" do
     @wiki.write_page("New Page", :markdown, "Hi", commit_details)
     page = @wiki.page("New Page")
     @wiki.update_page(page, page.name, page.format, "Bye", commit_details)
-    assert_equal "Bye", File.read(File.join(@path, "New-Page.md"))
+    assert_equal "Bye", File.read(File.join(@path, "New_Page.md"))
   end
 
   test "update a page with different name and same format" do
     @wiki.write_page("New Page", :markdown, "Hi", commit_details)
     page = @wiki.page("New Page")
     @wiki.update_page(page, "New Page 2", page.format, "Bye", commit_details)
-    assert_equal "Bye", File.read(File.join(@path, "New-Page-2.md"))
-    assert !File.exist?(File.join(@path, "New-Page.md"))
+    assert_equal "Bye", File.read(File.join(@path, "New_Page_2.md"))
+    assert !File.exist?(File.join(@path, "New_Page.md"))
   end
 
   test "update a page with same name and different format" do
     @wiki.write_page("New Page", :markdown, "Hi", commit_details)
     page = @wiki.page("New Page")
     @wiki.update_page(page, page.name, :textile, "Bye", commit_details)
-    assert_equal "Bye", File.read(File.join(@path, "New-Page.textile"))
-    assert !File.exist?(File.join(@path, "New-Page.md"))
+    assert_equal "Bye", File.read(File.join(@path, "New_Page.textile"))
+    assert !File.exist?(File.join(@path, "New_Page.md"))
   end
 
   test "update a page with different name and different format" do
     @wiki.write_page("New Page", :markdown, "Hi", commit_details)
     page = @wiki.page("New Page")
     @wiki.update_page(page, "New Page 2", :textile, "Bye", commit_details)
-    assert_equal "Bye", File.read(File.join(@path, "New-Page-2.textile"))
-    assert !File.exist?(File.join(@path, "New-Page.md"))
+    assert_equal "Bye", File.read(File.join(@path, "New_Page_2.textile"))
+    assert !File.exist?(File.join(@path, "New_Page.md"))
   end
 
   test "delete a page" do
     @wiki.write_page("New Page", :markdown, "Hi", commit_details)
     page = @wiki.page("New Page")
     @wiki.delete_page(page, commit_details)
-    assert !File.exist?(File.join(@path, "New-Page.md"))
+    assert !File.exist?(File.join(@path, "New_Page.md"))
   end
 
   teardown do
@@ -399,7 +398,7 @@ context "Wiki sync with working directory (filename contains whitespace)" do
   test "update a page with different name and same format" do
     page = @wiki.page("Samwise Gamgee")
     @wiki.update_page(page, "Sam Gamgee", page.format, "What we need is a few good taters.", commit_details)
-    assert_equal "What we need is a few good taters.", File.read(File.join(@path, "Sam-Gamgee.mediawiki"))
+    assert_equal "What we need is a few good taters.", File.read(File.join(@path, "Sam_Gamgee.mediawiki"))
     assert !File.exist?(File.join(@path, "Samwise Gamgee"))
   end
 
@@ -413,7 +412,7 @@ context "Wiki sync with working directory (filename contains whitespace)" do
   test "update a page with different name and different format" do
     page = @wiki.page("Samwise Gamgee")
     @wiki.update_page(page, "Sam Gamgee", :textile, "What we need is a few good taters.", commit_details)
-    assert_equal "What we need is a few good taters.", File.read(File.join(@path, "Sam-Gamgee.textile"))
+    assert_equal "What we need is a few good taters.", File.read(File.join(@path, "Sam_Gamgee.textile"))
     assert !File.exist?(File.join(@path, "Samwise Gamgee.mediawiki"))
   end
 
@@ -438,8 +437,8 @@ context "page_file_dir option" do
 
   test "write a page in sub directory" do
     @wiki.write_page("New Page", :markdown, "Hi", commit_details)
-    assert_equal "Hi", File.read(File.join(@path, @page_file_dir, "New-Page.md"))
-    assert !File.exist?(File.join(@path, "New-Page.md"))
+    assert_equal "Hi", File.read(File.join(@path, @page_file_dir, "New_Page.md"))
+    assert !File.exist?(File.join(@path, "New_Page.md"))
   end
 
   test "edit a page in a sub directory" do

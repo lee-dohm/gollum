@@ -49,7 +49,7 @@ context "Page" do
 
   test "get nested page" do
     page = @wiki.page('Eye Of Sauron')
-    assert_equal 'Mordor/Eye-Of-Sauron.md', page.path
+    assert_equal 'Mordor/Eye_Of_Sauron.md', page.path
   end
 
   test "url_path" do
@@ -59,7 +59,7 @@ context "Page" do
 
   test "nested url_path" do
     page = @wiki.page('Eye Of Sauron')
-    assert_equal 'Mordor/Eye-Of-Sauron', page.url_path
+    assert_equal 'Mordor/Eye_Of_Sauron', page.url_path
   end
 
   test "page versions" do

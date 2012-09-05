@@ -1,4 +1,3 @@
-# ~*~ encoding: utf-8 ~*~
 require File.expand_path(File.join(File.dirname(__FILE__), "helper"))
 
 context "GitAccess" do
@@ -18,7 +17,7 @@ context "GitAccess" do
     assert @access.ref_map.empty?
     assert @access.tree_map.empty?
     @access.tree 'master'
-    assert_equal({"master"=>"2659b3ace3af20a7e65e1ce973079f3e3e45d3b9"}, @access.ref_map)
+    assert_equal({"master"=>"c0379511d75c3e2faec837e4154e8095e35c8744"}, @access.ref_map)
 
     @access.tree '1db89ebba7e2c14d93b94ff98cfa3708a4f0d4e3'
     map = @access.tree_map['1db89ebba7e2c14d93b94ff98cfa3708a4f0d4e3']

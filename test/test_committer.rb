@@ -1,4 +1,3 @@
-# ~*~ encoding: utf-8 ~*~
 require File.expand_path(File.join(File.dirname(__FILE__), "helper"))
 
 context "Wiki" do
@@ -50,7 +49,7 @@ context "Wiki" do
   end
 
   test "parents with default master ref" do
-    ref = '2659b3ace3af20a7e65e1ce973079f3e3e45d3b9'
+    ref = 'c0379511d75c3e2faec837e4154e8095e35c8744'
     committer = Gollum::Committer.new(@wiki)
     assert_equal ref,  committer.parents.first.sha
   end
