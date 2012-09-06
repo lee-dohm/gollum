@@ -240,7 +240,7 @@ context "Markup" do
     @wiki = Gollum::Wiki.new(@path, :base_path => '/wiki')
     index = @wiki.repo.index
     index.add("alpha.jpg", "hi")
-    index.add("Bilbo-Baggins.md", "a [[alpha.jpg]] [[a | alpha.jpg]] b")
+    index.add("Bilbo_Baggins.md", "a [[alpha.jpg]] [[a | alpha.jpg]] b")
     index.commit("Add alpha.jpg")
 
     page = @wiki.page("Bilbo Baggins")
@@ -251,7 +251,7 @@ context "Markup" do
     @wiki = Gollum::Wiki.new(@path, :base_path => '/wiki')
     index = @wiki.repo.index
     index.add("greek/alpha.jpg", "hi")
-    index.add("greek/Bilbo-Baggins.md", "a [[alpha.jpg]] [[a | alpha.jpg]] b")
+    index.add("greek/Bilbo_Baggins.md", "a [[alpha.jpg]] [[a | alpha.jpg]] b")
     index.commit("Add alpha.jpg")
 
     page = @wiki.page("Bilbo Baggins")
@@ -372,7 +372,7 @@ context "Markup" do
   test "file link with relative path" do
     index = @wiki.repo.index
     index.add("greek/alpha.jpg", "hi")
-    index.add("greek/Bilbo-Baggins.md", "a [[Alpha|alpha.jpg]] b")
+    index.add("greek/Bilbo_Baggins.md", "a [[Alpha|alpha.jpg]] b")
     index.commit("Add alpha.jpg")
 
     page = @wiki.page("Bilbo Baggins")
@@ -382,7 +382,7 @@ context "Markup" do
 
   test "file link with external path" do
     index = @wiki.repo.index
-    index.add("greek/Bilbo-Baggins.md", "a [[Alpha|http://example.com/alpha.jpg]] b")
+    index.add("greek/Bilbo_Baggins.md", "a [[Alpha|http://example.com/alpha.jpg]] b")
     index.commit("Add alpha.jpg")
 
     page = @wiki.page("Bilbo Baggins")
@@ -402,7 +402,7 @@ context "Markup" do
              "<span class=\"mi\">1</span>\n</pre>\n</div>\n\n\n<p>b</p>"
 
     index = @wiki.repo.index
-    index.add("Bilbo-Baggins.md", content)
+    index.add("Bilbo_Baggins.md", content)
     index.commit("Add alpha.jpg")
 
     page = @wiki.page("Bilbo Baggins")
@@ -417,7 +417,7 @@ context "Markup" do
              "<span class=\"mi\">1</span>\n</pre>\n</div>\n\n\n<p>b</p>"
 
     index = @wiki.repo.index
-    index.add("Bilbo-Baggins.md", content)
+    index.add("Bilbo_Baggins.md", content)
     index.commit("Add alpha.jpg")
 
     page = @wiki.page("Bilbo Baggins")
@@ -449,7 +449,7 @@ context "Markup" do
              "s</span> <span class=\"o\">=</span> <span class=\"s1\">'やくしまるえつこ'" +
              "</span>\n</pre>\n</div>\n\n\n<p>b</p>"
     index = @wiki.repo.index
-    index.add("Bilbo-Baggins.md", content)
+    index.add("Bilbo_Baggins.md", content)
     index.commit("Add alpha.jpg")
 
     page = @wiki.page("Bilbo Baggins")
@@ -510,7 +510,7 @@ np.array([[2,2],[1,3]],np.float)
     output = /.*<img src="http:\/\/www\.websequencediagrams\.com\/\?img=\w{9}" \/>.*/
 
     index = @wiki.repo.index
-    index.add("Bilbo-Baggins.md", content)
+    index.add("Bilbo_Baggins.md", content)
     index.commit("Add sequence diagram")
 
     page = @wiki.page("Bilbo Baggins")
@@ -530,7 +530,7 @@ np.array([[2,2],[1,3]],np.float)
     result = {'tags'=>['foo','bar']}
 
     index = @wiki.repo.index
-    index.add("Bilbo-Baggins.md", content)
+    index.add("Bilbo_Baggins.md", content)
     index.commit("Add metadata")
 
     page = @wiki.page("Bilbo Baggins")
@@ -545,7 +545,7 @@ np.array([[2,2],[1,3]],np.float)
     result = {'tags'=>['foo','bar']}
 
     index = @wiki.repo.index
-    index.add("Bilbo-Baggins.md", content)
+    index.add("Bilbo_Baggins.md", content)
     index.commit("Add metadata")
 
     page = @wiki.page("Bilbo Baggins")
@@ -560,7 +560,7 @@ np.array([[2,2],[1,3]],np.float)
     result = {'foo'=>nil}
 
     index = @wiki.repo.index
-    index.add("Bilbo-Baggins.md", content)
+    index.add("Bilbo_Baggins.md", content)
     index.commit("Add metadata")
 
     page = @wiki.page("Bilbo Baggins")
@@ -689,7 +689,7 @@ end
 
   def render_page(content, ext = "md")
     index = @wiki.repo.index
-    index.add("Bilbo-Baggins.#{ext}", content)
+    index.add("Bilbo_Baggins.#{ext}", content)
     index.commit("Add baggins")
 
     page = @wiki.page("Bilbo Baggins")
@@ -710,7 +710,7 @@ end
   def relative_image(content, output)
     index = @wiki.repo.index
     index.add("greek/alpha.jpg", "hi")
-    index.add("greek/Bilbo-Baggins.md", content)
+    index.add("greek/Bilbo_Baggins.md", content)
     index.commit("Add alpha.jpg")
 
     @wiki.clear_cache

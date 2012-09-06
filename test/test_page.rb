@@ -27,10 +27,6 @@ context "Page" do
     assert_equal @wiki.page('Bilbo Baggins').path, @wiki.page('bilbo baggins').path
   end
 
-  test "get existing page with hyphen" do
-    assert_equal @wiki.page('Bilbo Baggins').path, @wiki.page('Bilbo-Baggins').path
-  end
-
   test "get existing page with underscore" do
     assert_equal @wiki.page('Bilbo Baggins').path, @wiki.page('Bilbo_Baggins').path
   end
@@ -81,8 +77,8 @@ context "Page" do
   end
 
   test "specific page version" do
-    page = @wiki.page('Bilbo Baggins', 'fbabba862dfa7ac35b39042dd4ad780c9f67b8cb')
-    assert_equal 'fbabba862dfa7ac35b39042dd4ad780c9f67b8cb', page.version.id
+    page = @wiki.page('Bilbo Baggins', '2659b3ace3af20a7e65e1ce973079f3e3e45d3b9')
+    assert_equal '2659b3ace3af20a7e65e1ce973079f3e3e45d3b9', page.version.id
   end
 
   test "no page match" do
