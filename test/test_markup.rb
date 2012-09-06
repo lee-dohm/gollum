@@ -127,6 +127,16 @@ context "Markup" do
     assert_match /\>J\. R\. R\. Tolkien\</,         output
   end
 
+  test "present page link" do
+    @wiki.write_page("Tolkien", :markdown, "a [[Bilbo Baggins]] b", commit_details)
+
+    page = @wiki.page("Tolkien")
+    output = page.formatted_data
+    assert_match /class="internal present"/, output
+    assert_match /href="\/Bilbo_Baggins"/, output
+    assert_match /\>Bilbo Baggins\</, output
+  end
+
   test "page link with custom base path" do
     ["/wiki", "/wiki/"].each_with_index do |path, i|
       name = "Bilbo Baggins #{i}"
