@@ -18,7 +18,7 @@ class String
   def to_url
     return nil if self.nil?
     return self if ['_Header', '_Footer', '_Sidebar'].include? self
-    remove_formatting.replace_whitespace("-").collapse("-").limit
+    remove_formatting.replace_whitespace("_").collapse("_").limit
   end
 end
 

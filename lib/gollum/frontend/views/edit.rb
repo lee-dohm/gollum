@@ -11,7 +11,7 @@ module Precious
       end
 
       def page_name
-        @name.gsub('-', ' ')
+        @name.gsub('_', ' ')
       end
 
       def header
