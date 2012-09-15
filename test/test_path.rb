@@ -10,8 +10,15 @@ context "Path" do
   end
 
   test 'can get path class from wiki' do
-    assert_equal @wiki.path_class, Gollum::Path
-    assert_equal @wiki.class.path_class, Gollum::Path
+    assert_equal Gollum::Path, @wiki.path_class
+    assert_equal Gollum::Path, @wiki.class.path_class
+  end
+
+  test 'can override the path class' do
+    wiki = Gollum::Wiki.new(testpath('examples/lotr.git'), :path_class => Object)
+
+    assert_equal Object, wiki.path_class
+    assert_equal Gollum::Path, wiki.class.path_class
   end
 
   test "filename to name" do
