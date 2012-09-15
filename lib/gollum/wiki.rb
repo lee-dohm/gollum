@@ -6,6 +6,9 @@ module Gollum
       # Sets the page class used by all instances of this Wiki.
       attr_writer :page_class
 
+      # Sets the path class used by all instances of this Wiki.
+      attr_writer :path_class
+
       # Sets the file class used by all instances of this Wiki.
       attr_writer :file_class
 
@@ -44,6 +47,17 @@ module Gollum
             superclass.page_class
           else
             ::Gollum::Page
+          end
+      end
+
+      # Gets the path class used by all instances of this Wiki.
+      # Default: Gollum::Path.
+      def path_class
+        @path_class ||
+          if superclass.respond_to?(:path_class)
+            superclass.path_class
+          else
+            ::Gollum::Path
           end
       end
 
@@ -168,6 +182,7 @@ module Gollum
       @access        = options[:access]       || GitAccess.new(path, @page_file_dir, @repo_is_bare)
       @base_path     = options[:base_path]    || "/"
       @page_class    = options[:page_class]   || self.class.page_class
+      @path_class    = options[:path_class]   || self.class.path_class
       @file_class    = options[:file_class]   || self.class.file_class
       @markup_classes = options[:markup_classes] || self.class.markup_classes
       @repo          = @access.repo
@@ -570,6 +585,9 @@ module Gollum
 
     # Gets the page class used by all instances of this Wiki.
     attr_reader :page_class
+
+    # Gets the path class used by all instances of this Wiki.
+    attr_reader :path_class
 
     # Gets the file class used by all instances of this Wiki.
     attr_reader :file_class

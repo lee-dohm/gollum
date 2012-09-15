@@ -5,6 +5,15 @@
 require File.expand_path(File.join(File.dirname(__FILE__), "helper"))
 
 context "Path" do
+  setup do
+    @wiki = Gollum::Wiki.new(testpath('examples/lotr.git'))
+  end
+
+  test 'can get path class from wiki' do
+    assert_equal @wiki.path_class, Gollum::Path
+    assert_equal @wiki.class.path_class, Gollum::Path
+  end
+
   test "filename to name" do
     assert_equal 'Filename', Gollum::Path.to_name("Filename.md")
   end
