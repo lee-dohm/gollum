@@ -19,5 +19,19 @@ module Gollum
       name = path =~ VALID_PAGE_RE && $1
       name.gsub('_', ' ')
     end
+
+    # Initializes a new instance of the +Path+ class.
+    # 
+    # @param wiki Reference to the Wiki instance.
+    def initialize(wiki)
+      @wiki = wiki
+    end
+
+    # Converts a wiki page name into a path.
+    # 
+    # @param name Name to convert into a path.
+    def to_path(name)
+      @wiki.base_path + name + '.' + @wiki.page_class.format_to_ext(Precious::App.settings.default_markup)
+    end
   end
 end

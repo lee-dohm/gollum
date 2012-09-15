@@ -7,6 +7,7 @@ require File.expand_path(File.join(File.dirname(__FILE__), "helper"))
 context "Path" do
   setup do
     @wiki = Gollum::Wiki.new(testpath('examples/lotr.git'))
+    @path = @wiki.path_class.new(@wiki)
   end
 
   test 'can get path class from wiki' do
@@ -43,5 +44,11 @@ context "Path" do
 
   test "filename with url encoded underscores to name" do
     assert_equal 'Filename With Special Characters', Gollum::Path.to_name("Filename%5FWith%5FSpecial%5FCharacters.md")
+  end
+
+  test 'name to path' do
+    path = @path.to_path('Filename')
+
+    assert_equal '/Filename.md', path
   end
 end
