@@ -27,11 +27,20 @@ module Gollum
       @wiki = wiki
     end
 
+    # Converts a path to a human-readable name.
+    # 
+    # @param path Path to convert to a human-readable name.
+    # @return Human-readable name for the page.
+    def to_name(path)
+      self.class.to_name(path)
+    end
+
     # Converts a wiki page name into a path.
     # 
     # @param name Name to convert into a path.
     # @param path Path within the wiki to place the file.
     # @param markup Markup language in which the page is written.
+    # @return Constructed wiki path.
     def to_path(name, path = '', markup = :default)
       name = name.gsub(/\s/, '_').squeeze('_')
 
