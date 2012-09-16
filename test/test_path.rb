@@ -81,4 +81,10 @@ context "Path" do
 
     assert_equal '/Filename.mediawiki', path
   end
+
+  test 'name with spaces at the beginning and end' do
+    path = @path.to_path('    Filename    ')
+
+    assert_equal '/Filename.md', path
+  end
 end

@@ -42,7 +42,7 @@ module Gollum
     # @param markup Markup language in which the page is written.
     # @return Constructed wiki path.
     def to_path(name, path = '', markup = :default)
-      name = name.gsub(/\s/, '_').squeeze('_')
+      name = name.gsub(/\s/, '_').collapse('_')
 
       markup = Precious::App.settings.default_markup if markup == :default      
       ext = @wiki.page_class.format_to_ext(markup)
