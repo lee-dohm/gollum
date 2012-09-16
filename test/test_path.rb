@@ -51,4 +51,34 @@ context "Path" do
 
     assert_equal '/Filename.md', path
   end
+
+  test 'name to path with subdirectory' do
+    path = @path.to_path('Filename', 'sub/dir')
+
+    assert_equal '/sub/dir/Filename.md', path
+  end
+
+  test 'name with spaces' do
+    path = @path.to_path('Filename with spaces')
+
+    assert_equal '/Filename_with_spaces.md', path
+  end
+
+  test 'name with multiple contiguous spaces' do
+    path = @path.to_path('Filename   with    multiple    contiguous   spaces')
+
+    assert_equal '/Filename_with_multiple_contiguous_spaces.md', path
+  end
+
+  test 'name with tab characters' do
+    path = @path.to_path("Filename\twith\ttab\tcharacters")
+
+    assert_equal '/Filename_with_tab_characters.md', path
+  end
+
+  test 'name with alternate wiki language' do
+    path = @path.to_path('Filename', '', :mediawiki)
+
+    assert_equal '/Filename.mediawiki', path
+  end
 end

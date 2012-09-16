@@ -30,8 +30,15 @@ module Gollum
     # Converts a wiki page name into a path.
     # 
     # @param name Name to convert into a path.
-    def to_path(name)
-      @wiki.base_path + name + '.' + @wiki.page_class.format_to_ext(Precious::App.settings.default_markup)
+    # @param path Path within the wiki to place the file.
+    # @param markup Markup language in which the page is written.
+    def to_path(name, path = '', markup = :default)
+      name = name.gsub(/\s/, '_').squeeze('_')
+
+      markup = Precious::App.settings.default_markup if markup == :default      
+      ext = @wiki.page_class.format_to_ext(markup)
+
+      ::File.join(@wiki.base_path, path, "#{name}.#{ext}")
     end
   end
 end
