@@ -46,6 +46,10 @@ context "Path" do
     assert_equal 'Filename With Special Characters', Gollum::Path.to_name("Filename%5FWith%5FSpecial%5FCharacters.md")
   end
 
+  test 'nil returned for invalid path' do
+    assert_nil Gollum::Path.to_name('Filename.foo')
+  end
+
   test 'name to path' do
     path = @path.to_path('Filename')
 

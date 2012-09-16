@@ -38,7 +38,7 @@ module Precious
       end
 
       def page_name
-        @name.gsub('_', ' ')
+        Gollum::Wiki.path_class.to_name(@name)
       end
 
       def formats

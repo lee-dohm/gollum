@@ -85,7 +85,7 @@ module Gollum
     #
     # Returns the filtered String.
     def self.canonicalize_filename(filename)
-      strip_filename(filename).gsub('_', ' ')
+      Gollum::Wiki.path_class.to_name(filename)
     end
 
     # Reusable filter to strip extension and path from filename

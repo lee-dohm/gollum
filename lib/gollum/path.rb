@@ -17,7 +17,7 @@ module Gollum
     def self.to_name(path)
       path = CGI::unescape(path)
       name = path =~ VALID_PAGE_RE && $1
-      name.gsub('_', ' ')
+      name.gsub('_', ' ') unless name.nil?
     end
 
     # Initializes a new instance of the +Path+ class.
