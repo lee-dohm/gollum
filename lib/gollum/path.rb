@@ -17,6 +17,14 @@ module Gollum
     def self.to_name(path)
       path = CGI::unescape(path)
       name = path =~ VALID_PAGE_RE && $1
+      to_readable(name)
+    end
+
+    # Converts a name into a human-readable name.
+    # 
+    # @param name Name to convert to a human-readable name.
+    # @return Human-readable name for the page.
+    def self.to_readable(name)
       name.gsub('_', ' ') unless name.nil?
     end
 

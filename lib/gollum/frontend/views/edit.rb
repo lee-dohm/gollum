@@ -11,7 +11,7 @@ module Precious
       end
 
       def page_name
-        Gollum::Wiki.path_class.to_name(@name)
+        Gollum::Wiki.path_class.to_readable(@name)
       end
 
       def header
