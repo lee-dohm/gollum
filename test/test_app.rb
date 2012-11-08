@@ -51,6 +51,14 @@ context "Frontend" do
     assert_not_equal page_1.version.sha, page_2.version.sha
   end
 
+  test "edit page with slash" do
+    page_1 = @wiki.page('A')
+    post "/edit/A", :content => 'abc', :page => 'A', :path => '/////',
+      :format => page_1.format, :message => 'def'
+    follow_redirect!
+    assert last_response.ok?
+  end
+
   test "edits page header footer and sidebar" do
     commits = @wiki.repo.commits('master').size
     page_1  = @wiki.page('A')
@@ -177,6 +185,9 @@ context "Frontend" do
     name = "A"
     post "/create", :content => 'abc', :page => name,
       :format => 'markdown', :message => 'def'
+
+    follow_redirect!
+
     assert last_response.ok?
 
     @wiki.clear_cache
@@ -252,6 +263,9 @@ context "Frontend" do
     page2 = @wiki.page('A')
     assert_equal page1.version.sha, page2.version.sha
   end
+=begin
+  # redirects are now handled by class MapGollum in bin/gollum
+  # they should be set in config.ru
 
   test "redirects from 'base_path' or 'base_path/' to 'base_path/Home'" do
     Precious::App.set(:wiki_options, {})
@@ -265,6 +279,28 @@ context "Frontend" do
     Precious::App.set(:wiki_options, { :base_path => '/wiki/' })
     get "/"
     assert_match "http://example.org/wiki/Home", last_response.headers['Location']
+
+    # Reset base path
+    Precious::App.set(:wiki_options, { :base_path => nil })
+  end
+=end
+  
+  test "author details in session are used" do
+    page1 = @wiki.page('A')
+    
+    gollum_author = { :name => 'ghi', :email => 'jkl' }
+    session = { 'gollum.author' => gollum_author }
+    
+    post "/edit/A", { :content => 'abc', :page => 'A', :format => page1.format, :message => 'def' }, { 'rack.session' => session }
+    follow_redirect!
+    assert last_response.ok?
+    
+    @wiki.clear_cache
+    page2 = @wiki.page(page1.name)
+    
+    author = page2.version.author
+    assert_equal 'ghi', author.name
+    assert_equal 'jkl', author.email
   end
 
   def app
@@ -333,6 +369,36 @@ context "Frontend with lotr" do
     assert !body.include?("Bilbo Baggins"), "/pages/Mordor/ should NOT include the page 'Bilbo Baggins'"
     assert body.include?("Eye Of Sauron"), "/pages/Mordor/ should include the page 'Eye Of Sauron'"
   end
+
+  # base path requires 'map' in a config.ru to work correctly.
+  test "create pages within sub-directories using base path" do
+    Precious::App.set(:wiki_options, { :base_path => 'wiki' })
+    page = 'path'
+    post "/create", :content => '123', :page => page,
+      :path => 'Mordor', :format => 'markdown', :message => 'oooh, scary'
+    # should be wiki/Mordor/path
+    assert_equal 'http://example.org/Mordor/' + page, last_response.headers['Location']
+    get '/Mordor/' + page
+    assert_match /123/, last_response.body
+
+    # Reset base path
+    Precious::App.set(:wiki_options, { :base_path => nil })
+  end
+
+  test "create pages within sub-directories using page file dir" do
+    Precious::App.set(:wiki_options, { :page_file_dir => 'wiki' })
+
+    post "/create", :content => 'one two', :page => 'base',
+      :path => 'Mordor', :format => 'markdown', :message => 'oooh, scary'
+    assert_equal 'http://example.org/wiki/Mordor/base', last_response.headers['Location']
+    get "/wiki/Mordor/base"
+
+    # Reset page_file_dir after request but before matching.
+    Precious::App.set(:wiki_options, { :page_file_dir => nil })
+
+    assert_match /one two/, last_response.body
+  end
+
 
   test "create pages within sub-directories" do
     post "/create", :content => 'big smelly creatures', :page => 'Orc',

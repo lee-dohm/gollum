@@ -45,6 +45,10 @@ opts = OptionParser.new do |opts|
     options['irb'] = true
   end
 
+  opts.on("--css", "Inject custom css. Uses custom.css from root repository") do
+    wiki_options[:css] = true
+  end
+
   opts.on("--page-file-dir [PATH]", "Specify the sub directory for all page files (default: repository root).") do |path|
     wiki_options[:page_file_dir] = path
   end
@@ -65,8 +69,16 @@ opts = OptionParser.new do |opts|
     wiki_options[:live_preview] = false
   end
 
-  opts.on("--no-mathjax", "Disables mathjax.") do
-    options['mathjax'] = false
+  opts.on("--mathjax", "Enables mathjax.") do
+    wiki_options[:mathjax] = true
+  end
+
+  opts.on("--show-all", "Shows all files in file view. By default only valid pages are shown.") do
+    wiki_options[:show_all] = true
+  end
+
+  opts.on("--collapse-tree", "Collapse file view tree. By default, expanded tree is shown.") do
+    wiki_options[:collapse_tree] = true
   end
 end
 
@@ -141,5 +153,31 @@ else
     require cfg
   end
 
-  Precious::App.run!(options)
+  base_path = wiki_options[:base_path]
+
+  if wiki_options[:base_path].nil?
+    Precious::App.run!(options)
+  else
+    require 'rack'
+
+    class MapGollum
+      def initialize base_path
+        @mg = Rack::Builder.new do
+          map '/' do
+            run Proc.new { [ 302, {'Location'=> "/#{base_path}" }, [] ] }
+          end
+
+          map "/#{base_path}" do
+            run Precious::App
+          end
+        end
+      end
+
+      def call(env)
+        @mg.call(env)
+      end
+    end
+    # Rack::Handler does not work with Ctrl + C. Use Rack::Server instead.
+    Rack::Server.new(:app => MapGollum.new(base_path), :Port => options['port']).start
+  end
 end

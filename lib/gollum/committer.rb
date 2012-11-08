@@ -1,3 +1,4 @@
+# ~*~ encoding: utf-8 ~*~
 module Gollum
   # Responsible for handling the commit process for a Wiki.  It sets up the
   # Git index, provides methods for modifying the tree, and stores callbacks
@@ -100,9 +101,13 @@ module Gollum
 
         tree.blobs.each do |blob|
           next if page_path_scheduled_for_deletion?(index.tree, fullpath)
-          file = blob.name.downcase.sub(/\.\w+$/, '')
-          file_ext = ::File.extname(blob.name).sub(/^\./, '')
-          if downpath == file && !(allow_same_ext && file_ext == ext)
+          
+          existing_file = blob.name.downcase.sub(/\.\w+$/, '')
+          existing_file_ext = ::File.extname(blob.name).sub(/^\./, '')
+
+          new_file_ext = ::File.extname(path).sub(/^\./, '')
+
+          if downpath == existing_file && !(allow_same_ext && new_file_ext == existing_file_ext)
             raise DuplicatePageError.new(dir, blob.name, path)
           end
         end

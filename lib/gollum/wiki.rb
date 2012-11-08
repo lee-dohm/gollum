@@ -1,3 +1,4 @@
+# ~*~ encoding: utf-8 ~*~
 module Gollum
   class Wiki
     include Pagination
@@ -150,6 +151,10 @@ module Gollum
     # Gets the boolean live preview value.
     attr_reader :live_preview
 
+    # Injects custom css from custom.css in root repo.
+    # Defaults to false
+    attr_reader :css
+
     # Public: Initialize a new Gollum Repo.
     #
     # path    - The String path to the Git repository that holds the Gollum
@@ -168,6 +173,9 @@ module Gollum
     #           :ref - String the repository ref to retrieve pages from
     #           :ws_subs       - Array of chars to sub for ws in filenames.
     #           :mathjax       - Set to false to disable mathjax.
+    #           :show_all      - Show all files in file view, not just valid pages.
+    #                            Default: false
+    #           :collapse_tree - Start with collapsed file view. Default: false
     #
     # Returns a fresh Gollum::Repo.
     def initialize(path, options = {})
@@ -195,6 +203,9 @@ module Gollum
       @live_preview  = options.fetch(:live_preview, true)
       @universal_toc = options.fetch(:universal_toc, false)
       @mathjax = options[:mathjax] || true
+      @show_all             = options.fetch :show_all, false
+      @collapse_tree        = options.fetch :collapse_tree, false
+      @css                  = options.fetch :css, false
     end
 
     # Public: check whether the wiki's git repo exists on the filesystem.
@@ -211,9 +222,9 @@ module Gollum
     # dir     - The directory String relative to the repo.
     #
     # Returns a Gollum::Page or nil if no matching page was found.
-    def page(name, version = @ref, dir = nil)
+    def page(name, version = @ref, dir = nil, exact = false)
       version = @ref if version.nil?
-      @page_class.new(self).find(name, version, dir)
+      @page_class.new(self).find(name, version, dir, exact)
     end
 
     # Public: Convenience method instead of calling page(name, nil, dir).
@@ -223,8 +234,8 @@ module Gollum
     # dir     - The directory String relative to the repo.
     #
     # Returns a Gollum::Page or nil if no matching page was found.
-    def paged(name, dir = nil, version = @ref)
-      page(name, version, dir)
+    def paged(name, dir = nil, exact = false, version = @ref)
+      page(name, version, dir, exact)
     end
 
     # Public: Get the static file for a given name.
@@ -510,14 +521,19 @@ module Gollum
       @repo.git.grep(*args).split("\n").each do |line|
         result = line.split(':')
         result_1 = result[1]
-        file_name = result_1.chomp(::File.extname(result_1))
+        # Remove ext only from known extensions.
+        # test.pdf => test.pdf, test.md => test
+        file_name = Page::valid_page_name?(result_1) ? result_1.chomp(::File.extname(result_1)) :
+                    result_1
         results[file_name] = result[2].to_i
       end
 
       # Use git ls-files '*query*' to search for file names. Grep only searches file content.
       # Spaces are converted to dashes when saving pages to disk.
       @repo.git.ls_files({}, "*#{ query.gsub(' ', '-') }*").split("\n").each do |line|
-        file_name = line.chomp(::File.extname(line))
+        # Remove ext only from known extensions.
+        file_name = Page::valid_page_name?(line) ? line.chomp(::File.extname(line)) :
+                    line
         # If there's not already a result for file_name then
         # the value is nil and nil.to_i is 0.
         results[file_name] = results[file_name].to_i + 1;
@@ -600,6 +616,13 @@ module Gollum
 
     # Toggles mathjax.
     attr_reader :mathjax
+
+    # Toggles showing all files in files view. Default is false.
+    # When false, only valid pages in the git repo are displayed.
+    attr_reader :show_all
+
+    # Start with collapsed file view. Default: false
+    attr_reader :collapse_tree
 
     # Normalize the data.
     #

@@ -1,18 +1,15 @@
 #encoding: utf-8
 
-require File.expand_path(File.join(File.dirname(__FILE__), "helper"))
+require File.expand_path( "../helper", __FILE__ )
+require File.expand_path( "../wiki_factory", __FILE__ )
 
 context "Markup" do
   setup do
-    @path = testpath("examples/test.git")
-    FileUtils.rm_rf(@path)
-    Grit::Repo.init_bare(@path)
-    Gollum::Wiki.default_options = {:universal_toc => false}
-    @wiki = Gollum::Wiki.new(@path)
+    @wiki, @path, @teardown = WikiFactory.create 'examples/test.git'
   end
 
   teardown do
-    FileUtils.rm_r(File.join(File.dirname(__FILE__), *%w[examples test.git]))
+    @teardown.call
   end
 
   test "formats page from Wiki#pages" do
@@ -58,6 +55,21 @@ context "Markup" do
   # Links
   #
   #########################################################################
+
+  test "absolute link to non-existent page" do
+    @wiki.write_page("linktest", :markdown, "[[/Page]]", commit_details)
+
+    page    = @wiki.page("linktest")
+    doc     = Nokogiri::HTML page.formatted_data
+    paras   = doc / :p
+    para    = paras.first
+    anchors = para / :a
+    assert_equal 1, paras.size
+    assert_equal 1, anchors.size
+    assert_equal 'internal absent', anchors[0]['class']
+    assert_equal '/Page',           anchors[0]['href']
+    assert_equal '/Page',           anchors[0].text
+  end
 
   test "double page links no space" do
     @wiki.write_page("Bilbo Baggins", :markdown, "a [[Foo]][[Bar]] b", commit_details)
@@ -185,6 +197,84 @@ context "Markup" do
     assert_equal "<p><code>sed -i '' 's/[[:space:]]*$//'</code></p>", page.formatted_data
   end
 
+  test "regexp gsub! backref (#383)" do
+    # bug only triggers on "```" syntax
+    # not `code`
+    page = 'test_rgx'
+    @wiki.write_page(page, :markdown,
+      (<<-'DATA'
+          ```
+          rot13='tr '\''A-Za-z'\'' '\''N-ZA-Mn-za-m'\'
+          ```
+          DATA
+      ), commit_details)
+    output = @wiki.page(page).formatted_data
+    expected = %Q{<pre><code>      <div class=\"highlight\"><pre><span class=\"n\">rot13</span><span class=\"p\">=</span><span class=\"s\">'tr '</span><span class=\"o\">\\</span><span class=\"s\">''</span><span class=\"n\">A</span><span class=\"o\">-</span><span class=\"n\">Za</span><span class=\"o\">-</span><span class=\"n\">z</span><span class=\"o\">'\\</span><span class=\"s\">''</span> <span class=\"s\">'\\''N-ZA-Mn-za-m'</span><span class=\"o\">\\</span><span class=\"s\">'</span>\n</pre></div>\n</code></pre>}
+    assert_equal expected, output
+  end
+
+  # Issue #568
+  test "tilde code blocks without a language" do
+    page = 'test_rgx'
+    @wiki.write_page(page, :markdown,
+      %Q(~~~
+'hi'
+~~~
+      ), commit_details)
+    output = @wiki.page(page).formatted_data
+    expected = %Q{<div class=\"highlight\"><pre><span class=\"s\">'hi'</span>\n</pre></div>}
+    assert_equal expected, output
+  end
+
+  test "tilde code blocks #537" do
+    page = 'test_rgx'
+    @wiki.write_page(page, :markdown,
+      %Q(~~~ {.ruby}
+'hi'
+~~~
+      ), commit_details)
+    output = @wiki.page(page).formatted_data
+    expected = %Q{<div class=\"highlight\"><pre><span class=\"s1\">'hi'</span>\n</pre></div>}
+    assert_equal expected, output
+  end
+
+  # Issue #537
+  test "tilde code blocks with more than one class" do
+    page = 'test_rgx'
+    @wiki.write_page(page, :markdown,
+      %Q(~~~ {#hi .ruby .sauce}
+'hi'
+~~~
+      ), commit_details)
+    output = @wiki.page(page).formatted_data
+    expected = %Q{<div class=\"highlight\"><pre><span class=\"s1\">'hi'</span>\n</pre></div>}
+    assert_equal expected, output
+  end
+
+  # Issue #537
+  test "tilde code blocks with lots of tildes" do
+    page = 'test_rgx'
+    @wiki.write_page(page, :markdown,
+      %Q(~~~~~~ {#hi .ruby .sauce}
+~~
+'hi'~
+~~~~~~
+      ), commit_details)
+    output = @wiki.page(page).formatted_data
+    expected = %Q{<div class=\"highlight\"><pre><span class=\"o\">~~</span>\n<span class=\"s1\">'hi'</span><span class=\"o\">~</span>\n</pre></div>}
+    assert_equal expected, output
+  end
+
+  test "four space indented code block" do
+    page = 'test_four'
+    @wiki.write_page(page, :markdown,
+      %(    test
+    test), commit_details)
+    output = @wiki.page(page).formatted_data
+    expected = %(<pre><code>test\ntest\n</code></pre>)
+    assert_equal expected, output
+  end
+
   test "wiki link within code block" do
     @wiki.write_page("Potato", :markdown, "    sed -i '' 's/[[:space:]]*$//'", commit_details)
     page = @wiki.page("Potato")
@@ -210,7 +300,7 @@ context "Markup" do
 
       page = @wiki.page(name)
       output = page.formatted_data
-      assert_equal %{<p>a <img src="#{scheme}://example.com/bilbo.jpg"> b</p>}, output
+      assert_equal %{<p>a <img src=\"#{scheme}://example.com/bilbo.jpg\" /> b</p>}, output
     end
   end
 
@@ -221,7 +311,7 @@ context "Markup" do
 
       page = @wiki.page(name)
       output = page.formatted_data
-      assert_equal %{<p>a <img src="#{scheme}://example.com/bilbo.JPG"> b</p>}, output
+      assert_equal %{<p>a <img src=\"#{scheme}://example.com/bilbo.JPG\" /> b</p>}, output
     end
   end
 
@@ -233,7 +323,7 @@ context "Markup" do
     @wiki.write_page("Bilbo Baggins", :markdown, "a [[/alpha.jpg]] [[a | /alpha.jpg]] b", commit_details)
 
     page = @wiki.page("Bilbo Baggins")
-    assert_equal %{<p>a <img src="/wiki/alpha.jpg"><a href="/wiki/alpha.jpg">a</a> b</p>}, page.formatted_data
+    assert_equal %{<p>a <img src=\"/wiki/alpha.jpg\" /><a href=\"/wiki/alpha.jpg\">a</a> b</p>}, page.formatted_data
   end
 
   test "image with relative path on root" do
@@ -244,7 +334,7 @@ context "Markup" do
     index.commit("Add alpha.jpg")
 
     page = @wiki.page("Bilbo Baggins")
-    assert_equal %{<p>a <img src="/wiki/alpha.jpg"><a href="/wiki/alpha.jpg">a</a> b</p>}, page.formatted_data
+    assert_equal %Q{<p>a <img src=\"/wiki/alpha.jpg\" /><a href=\"/wiki/alpha.jpg\">a</a> b</p>}, page.formatted_data
   end
 
   test "image with relative path" do
@@ -256,7 +346,7 @@ context "Markup" do
 
     page = @wiki.page("Bilbo Baggins")
     output = page.formatted_data
-    assert_equal %{<p>a <img src="/wiki/greek/alpha.jpg"><a href="/wiki/greek/alpha.jpg">a</a> b</p>}, output
+    assert_equal %{<p>a <img src=\"/wiki/greek/alpha.jpg\" /><a href=\"/wiki/greek/alpha.jpg\">a</a> b</p>}, output
   end
 
   test "image with absolute path on a preview" do
@@ -266,7 +356,7 @@ context "Markup" do
     index.commit("Add alpha.jpg")
 
     page = @wiki.preview_page("Test", "a [[/alpha.jpg]] b", :markdown)
-    assert_equal %{<p>a <img src="/wiki/alpha.jpg"> b</p>}, page.formatted_data
+    assert_equal %{<p>a <img src=\"/wiki/alpha.jpg\" /> b</p>}, page.formatted_data
   end
 
   test "image with relative path on a preview" do
@@ -277,12 +367,12 @@ context "Markup" do
     index.commit("Add alpha.jpg")
 
     page = @wiki.preview_page("Test", "a [[alpha.jpg]] [[greek/alpha.jpg]] b", :markdown)
-    assert_equal %{<p>a <img src="/wiki/alpha.jpg"><img src="/wiki/greek/alpha.jpg"> b</p>}, page.formatted_data
+    assert_equal %{<p>a <img src=\"/wiki/alpha.jpg\" /><img src=\"/wiki/greek/alpha.jpg\" /> b</p>}, page.formatted_data
   end
 
   test "image with alt" do
     content = "a [[alpha.jpg|alt=Alpha Dog]] b"
-    output = %{<p>a <img src="/greek/alpha.jpg" alt="Alpha Dog"> b</p>}
+    output = %{<p>a<imgsrc=\"/greek/alpha.jpg\"alt=\"AlphaDog\"/>b</p>}
     relative_image(content, output)
   end
 
@@ -290,7 +380,7 @@ context "Markup" do
     %w{em px}.each do |unit|
       %w{width height}.each do |dim|
         content = "a [[alpha.jpg|#{dim}=100#{unit}]] b"
-        output = "<p>a <img src=\"/greek/alpha.jpg\" #{dim}=\"100#{unit}\"> b</p>"
+        output = "<p>a<imgsrc=\"/greek/alpha.jpg\"#{dim}=\"100#{unit}\"/>b</p>"
         relative_image(content, output)
       end
     end
@@ -299,7 +389,7 @@ context "Markup" do
   test "image with bogus dimension" do
     %w{width height}.each do |dim|
       content = "a [[alpha.jpg|#{dim}=100]] b"
-      output = "<p>a <img src=\"/greek/alpha.jpg\"> b</p>"
+      output = "<p>a<imgsrc=\"/greek/alpha.jpg\"/>b</p>"
       relative_image(content, output)
     end
   end
@@ -307,7 +397,7 @@ context "Markup" do
   test "image with vertical align" do
     %w{top texttop middle absmiddle bottom absbottom baseline}.each do |align|
       content = "a [[alpha.jpg|align=#{align}]] b"
-      output = "<p>a <img src=\"/greek/alpha.jpg\" align=\"#{align}\"> b</p>"
+      output = %Q{<p>a<imgsrc=\"/greek/alpha.jpg\"align=\"#{align}\"/>b</p>}
       relative_image(content, output)
     end
   end
@@ -315,40 +405,40 @@ context "Markup" do
   test "image with horizontal align" do
     %w{left center right}.each do |align|
       content = "a [[alpha.jpg|align=#{align}]] b"
-      output = "<p>a <span class=\"align-#{align}\"><span><img src=\"/greek/alpha.jpg\"></span></span> b</p>"
+      output = "<p>a<spanclass=\"align-#{align}\"><span><imgsrc=\"/greek/alpha.jpg\"/></span></span>b</p>"
       relative_image(content, output)
     end
   end
 
   test "image with float" do
     content = "a\n\n[[alpha.jpg|float]]\n\nb"
-    output = "<p>a</p>\n\n<p><span class=\"float-left\"><span><img src=\"/greek/alpha.jpg\"></span></span></p>\n\n<p>b</p>"
+    output = "<p>a</p><p><spanclass=\"float-left\"><span><imgsrc=\"/greek/alpha.jpg\"/></span></span></p><p>b</p>"
     relative_image(content, output)
   end
 
   test "image with float and align" do
     %w{left right}.each do |align|
       content = "a\n\n[[alpha.jpg|float|align=#{align}]]\n\nb"
-      output = "<p>a</p>\n\n<p><span class=\"float-#{align}\"><span><img src=\"/greek/alpha.jpg\"></span></span></p>\n\n<p>b</p>"
+      output = "<p>a</p><p><spanclass=\"float-#{align}\"><span><imgsrc=\"/greek/alpha.jpg\"/></span></span></p><p>b</p>"
       relative_image(content, output)
     end
   end
 
   test "image with frame" do
     content = "a\n\n[[alpha.jpg|frame]]\n\nb"
-    output = "<p>a</p>\n\n<p><span class=\"frame\"><span><img src=\"/greek/alpha.jpg\"></span></span></p>\n\n<p>b</p>"
+    output = "<p>a</p><p><spanclass=\"frame\"><span><imgsrc=\"/greek/alpha.jpg\"/></span></span></p><p>b</p>"
     relative_image(content, output)
   end
 
   test "absolute image with frame" do
     content = "a\n\n[[http://example.com/bilbo.jpg|frame]]\n\nb"
-    output = "<p>a</p>\n\n<p><span class=\"frame\"><span><img src=\"http://example.com/bilbo.jpg\"></span></span></p>\n\n<p>b</p>"
+    output = "<p>a</p><p><spanclass=\"frame\"><span><imgsrc=\"http://example.com/bilbo.jpg\"/></span></span></p><p>b</p>"
     relative_image(content, output)
   end
 
   test "image with frame and alt" do
     content = "a\n\n[[alpha.jpg|frame|alt=Alpha]]\n\nb"
-    output = "<p>a</p>\n\n<p><span class=\"frame\"><span><img src=\"/greek/alpha.jpg\" alt=\"Alpha\"><span>Alpha</span></span></span></p>\n\n<p>b</p>"
+    output = "<p>a</p><p><spanclass=\"frame\"><span><imgsrc=\"/greek/alpha.jpg\"alt=\"Alpha\"/><span>Alpha</span></span></span></p><p>b</p>"
     relative_image(content, output)
   end
 
@@ -395,11 +485,9 @@ context "Markup" do
   #
   #########################################################################
 
-  test "code blocks" do
+  test "regular code blocks" do
     content = "a\n\n```ruby\nx = 1\n```\n\nb"
-    output = "<p>a</p>\n\n<div class=\"highlight\">\n<pre>" +
-             "<span class=\"n\">x</span> <span class=\"o\">=</span> " +
-             "<span class=\"mi\">1</span>\n</pre>\n</div>\n\n\n<p>b</p>"
+    output = %Q{<p>a</p>\n\n<div class=\"highlight\"><pre><span class=\"n\">x</span> <span class=\"o\">=</span> <span class=\"mi\">1</span>\n</pre></div>\n\n<p>b</p>}
 
     index = @wiki.repo.index
     index.add("Bilbo_Baggins.md", content)
@@ -412,9 +500,7 @@ context "Markup" do
 
   test "code blocks with carriage returns" do
     content = "a\r\n\r\n```ruby\r\nx = 1\r\n```\r\n\r\nb"
-    output = "<p>a</p>\n\n<div class=\"highlight\">\n<pre>" +
-             "<span class=\"n\">x</span> <span class=\"o\">=</span> " +
-             "<span class=\"mi\">1</span>\n</pre>\n</div>\n\n\n<p>b</p>"
+    output = %Q{<p>a</p>\n\n<div class=\"highlight\"><pre><span class=\"n\">x</span> <span class=\"o\">=</span> <span class=\"mi\">1</span>\n</pre></div>\n\n<p>b</p>}
 
     index = @wiki.repo.index
     index.add("Bilbo_Baggins.md", content)
@@ -445,9 +531,7 @@ context "Markup" do
 
   test "code blocks with multibyte caracters indent" do
     content = "a\n\n```ruby\ns = 'やくしまるえつこ'\n```\n\nb"
-    output = "<p>a</p>\n\n<div class=\"highlight\">\n<pre><span class=\"n\">" +
-             "s</span> <span class=\"o\">=</span> <span class=\"s1\">'やくしまるえつこ'" +
-             "</span>\n</pre>\n</div>\n\n\n<p>b</p>"
+    output = %Q{<p>a</p>\n\n<div class=\"highlight\"><pre><span class=\"n\">s</span> <span class=\"o\">=</span> <span class=\"s1\">'やくしまるえつこ'</span>\n</pre></div>\n\n<p>b</p>}
     index = @wiki.repo.index
     index.add("Bilbo_Baggins.md", content)
     index.commit("Add alpha.jpg")
@@ -497,6 +581,43 @@ np.array([[2,2],[1,3]],np.float)
     assert_match /div class="highlight"/, rendered, "#{markup_class} doesn't highlight code\n #{rendered}"
     assert_match /span class="n"/, rendered, "#{markup_class} doesn't highlight code\n #{rendered}"
     assert_match /\(\[\[/, rendered, "#{markup_class} parses out wiki links\n#{rendered}"
+  end
+
+  test "embed code is escaped" do
+    @wiki.write_page("script", :markdown, "a <script></script> b", commit_details)
+    @wiki.write_page("page", :markdown, "```html:script```", commit_details)
+
+    output_script = @wiki.page("script").formatted_data
+    output_page = @wiki.page("page").formatted_data
+
+    assert_equal %Q{<p>a  b</p>}, output_script
+    assert_equal %Q{<div class=\"highlight\"><pre><span class=\"nt\">&lt;p&gt;</span>a  b<span class=\"nt\">&lt;/p&gt;</span>\n</pre></div>}, output_page
+  end
+
+  test "embed code page absolute link" do
+    @wiki.write_page("base", :markdown, "a\n!base\b", commit_details)
+    @wiki.write_page("a", :markdown, "a\n```html:/base```\b", commit_details)
+
+    page = @wiki.page("a")
+    output = page.formatted_data
+    assert_equal %Q{<p>a\n</p><div class=\"highlight\"><pre><span class=\"nt\">&lt;p&gt;</span>a\n!base<span class=\"nt\">&lt;/p&gt;</span>\n</pre></div>\n}, output
+  end
+
+  test "embed code page relative link" do
+    @wiki.write_page("base", :markdown, "a\n!rel\b", commit_details)
+    @wiki.write_page("a", :markdown, "a\n```html:base```\b", commit_details)
+
+    page = @wiki.page("a")
+    output = page.formatted_data
+    assert_equal %Q{<p>a\n</p><div class=\"highlight\"><pre><span class=\"nt\">&lt;p&gt;</span>a\n!rel<span class=\"nt\">&lt;/p&gt;</span>\n</pre></div>\n}, output
+  end
+
+  test "code block in unsupported language" do
+    @wiki.write_page("a", :markdown, "a\n```nonexistent\ncode\n```\nb", commit_details)
+
+    page = @wiki.page("a")
+    output = page.formatted_data
+    assert_equal %Q{<p>a\ncode\nb</p>}, output
   end
 
   #########################################################################

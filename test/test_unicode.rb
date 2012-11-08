@@ -15,12 +15,50 @@ context "Unicode Support" do
     FileUtils.rm_rf(@path)
   end
 
-  test "create and read non-latin page" do
+  test "uri encode" do
+    c = '한글'
+    assert_equal '%ED%95%9C%EA%B8%80', encodeURIComponent(c)
+    assert_equal '%ED%95%9C%EA%B8%80', CGI::escape(c)
+  end
+
+  test "create and read non-latin page with anchor" do
     @wiki.write_page("test", :markdown, "# 한글")
 
     page = @wiki.page("test")
     assert_equal Gollum::Page, page.class
     assert_equal "# 한글", utf8(page.raw_data)
+
+    # markup.rb
+    doc     = Nokogiri::HTML page.formatted_data
+    h1s     = doc / :h1
+    h1      = h1s.first
+    anchors = h1 / :a
+    assert_equal 1, h1s.size
+    assert_equal 1, anchors.size
+    assert_equal '#한글',  anchors[0]['href']
+    assert_equal  '한글',  anchors[0]['id']
+    assert_equal 'anchor', anchors[0]['class']
+    assert_equal '',       anchors[0].text
+  end
+
+  test "create and read non-latin page with anchor 2" do
+    @wiki.write_page("test", :markdown, "# \"La\" faune d'Édiacara")
+
+    page = @wiki.page("test")
+    assert_equal Gollum::Page, page.class
+    assert_equal "# \"La\" faune d'Édiacara", utf8(page.raw_data)
+
+    # markup.rb test: ', ", É
+    doc     = Nokogiri::HTML page.formatted_data
+    h1s     = doc / :h1
+    h1      = h1s.first
+    anchors = h1 / :a
+    assert_equal 1, h1s.size
+    assert_equal 1, anchors.size
+    assert_equal %q(#%22La%22-faune-d'Édiacara), anchors[0]['href']
+    assert_equal %q(%22La%22-faune-d'Édiacara),  anchors[0]['id']
+    assert_equal 'anchor',                 anchors[0]['class']
+    assert_equal '',                       anchors[0].text
   end
 
   test "unicode with existing format rules" do

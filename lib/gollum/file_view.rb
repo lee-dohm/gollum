@@ -1,3 +1,4 @@
+# ~*~ encoding: utf-8 ~*~
 module Gollum
 =begin
   FileView requires that:
@@ -5,8 +6,13 @@ module Gollum
     - Then all the folders are sorted and processed
 =end
   class FileView
-    def initialize pages
+    # common use cases:
+    # set pages to wiki.pages and show_all to false
+    # set pages to wiki.pages + wiki.files and show_all to true
+    def initialize pages, options = {}
       @pages = pages
+      @show_all = options[:show_all] || false
+      @checked = options[:collapse_tree] ? '' : "checked"
     end
 
     def enclose_tree string
@@ -26,7 +32,7 @@ module Gollum
     def new_sub_folder path
       <<-HTML
       <li>
-        <label>#{path}</label> <input type="checkbox" checked />
+        <label>#{path}</label> <input type="checkbox" #{@checked} />
         <ol>
       HTML
     end
@@ -39,7 +45,16 @@ module Gollum
     end
 
     def url_for_page page
-      url = ::File.join(::File.dirname(page.path), page.filename_stripped)
+      url = ''
+      if @show_all
+        # Remove ext for valid pages.
+        filename = page.filename
+        filename = Page::valid_page_name?(filename) ? filename.chomp(::File.extname(filename)) : filename
+
+        url = ::File.join(::File.dirname(page.path), filename)
+      else
+        url = ::File.join(::File.dirname(page.path), page.filename_stripped)
+      end
       url = url[2..-1] if url[0,2] == './'
       url
     end
@@ -74,7 +89,7 @@ module Gollum
         url  = url_for_page page
         html += <<-HTML
         <li>
-          <label>#{::File.dirname(page.path)}</label> <input type="checkbox" checked />
+          <label>#{::File.dirname(page.path)}</label> <input type="checkbox" #{@checked} />
           <ol>
             <li class="file"><a href="#{url}">#{name}</a></li>
          </ol>

@@ -1,3 +1,4 @@
+# ~*~ encoding: utf-8 ~*~
 module Gollum
   class File
     Wiki.file_class = self
@@ -11,6 +12,22 @@ module Gollum
       @wiki = wiki
       @blob = nil
       @path = nil
+    end
+
+    # Public: The url path required to reach this page within the repo.
+    #
+    # Returns the String url_path
+    def url_path
+      path = self.path
+      path = path.sub(/\/[^\/]+$/, '/') if path.include?('/')
+      path
+    end
+
+    # Public: The url_path, but CGI escaped.
+    #
+    # Returns the String url_path
+    def escaped_url_path
+      CGI.escape(self.url_path).gsub('%2F','/')
     end
 
     # Public: The on-disk filename of the file.

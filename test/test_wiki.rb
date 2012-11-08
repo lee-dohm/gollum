@@ -122,7 +122,7 @@ context "Wiki page previewing" do
   test "preview_page" do
     page = @wiki.preview_page("Test", "# Bilbo", :markdown)
     assert_equal "# Bilbo", page.raw_data
-    assert_equal %Q{<h1>Bilbo<a class="anchor" id="Bilbo" href="#Bilbo"></a>\n</h1>}, page.formatted_data
+    assert_equal %Q{<h1>Bilbo<a class=\"anchor\" id=\"Bilbo\" href=\"#Bilbo\"></a></h1>}, page.formatted_data
     assert_equal "Test.md", page.filename
     assert_equal "Test", page.name
   end
@@ -140,6 +140,16 @@ context "Wiki TOC" do
     assert_equal "# Bilbo", page.raw_data
     assert_equal '<h1>Bilbo<a class="anchor" id="Bilbo" href="#Bilbo"></a></h1>', page.formatted_data.gsub(/\n/,"")
     assert_equal %{<div class="toc"><div class="toc-title">Table of Contents</div><ul><li><a href="#Bilbo">Bilbo</a></li></ul></div>}, page.toc_data.gsub(/\n */,"")
+  end
+
+  # Ensure ' creates valid links in TOC
+  # Incorrect: <a href=\"#a\" b=\"\">
+  #   Correct: <a href=\"#a'b\">
+  test "' in link" do
+    page = @wiki.preview_page("Test", "# a'b", :markdown)
+    assert_equal "# a'b", page.raw_data
+    assert_equal %q{<h1>a'b<a class="anchor" id="a'b" href="#a'b"></a></h1>}, page.formatted_data.gsub(/\n/,"")
+    assert_equal %{<div class=\"toc\"><div class=\"toc-title\">Table of Contents</div><ul><li><a href=\"#a'b\">a'b</a></li></ul></div>}, page.toc_data.gsub(/\n */,"")
   end
 end
 

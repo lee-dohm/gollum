@@ -1,3 +1,4 @@
+# ~*~ encoding: utf-8 ~*~
 module Precious
   module Helpers
     # Extract the path string that Gollum::Wiki expects
@@ -16,6 +17,20 @@ module Precious
 
     def sanitize_empty_params(param)
       [nil,''].include?(param) ? nil : CGI.unescape(param)
+    end
+
+    # Remove all slashes from the start of string.
+    # Remove all double slashes
+    def clean_url url
+      return url if url.nil?
+      url.gsub('%2F','/').gsub(/^\/+/,'').gsub('//','/')
+    end
+
+    def trim_leading_slash url
+      return url if url.nil?
+      url.gsub!('%2F','/')
+      return '/' + url.gsub(/^\/+/,'') if url[0,1] == '/'
+      url
     end
   end
 end

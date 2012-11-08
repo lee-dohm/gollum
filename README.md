@@ -2,6 +2,7 @@ gollum -- A wiki built on top of Git
 ====================================
 
 [![Build Status](https://secure.travis-ci.org/github/gollum.png?branch=master)](http://travis-ci.org/github/gollum)
+[![Dependency Status](https://gemnasium.com/github/gollum.png)](https://gemnasium.com/github/gollum)
 
 ## DESCRIPTION
 
@@ -18,6 +19,11 @@ number of ways depending on your needs. You can edit your wiki locally:
 Gollum follows the rules of [Semantic Versioning](http://semver.org/) and uses
 [TomDoc](http://tomdoc.org/) for inline documentation.
 
+## SYSTEM REQUIREMENTS
+- Python 2.5+ (2.7.3 recommended)
+- Ruby 1.8.7+ (1.9.3 recommended)
+- Unix like operating system (OS X, Ubuntu, Debian, and more)
+- Will not work on Windows (because of [grit](https://github.com/github/grit))
 
 ## INSTALLATION
 
@@ -295,7 +301,7 @@ This is useful for writing about the link syntax in your wiki pages.
 
 Gollum has a special tag to insert a table of contents (new in v2.1)
 
-    '[[_TOC_]]
+    [[_TOC_]]
 
 This tag is case sensitive, use all upper case.  The TOC tag can be inserted
 into the `_Header`, `_Footer` or `_Sidebar` files too.
@@ -334,27 +340,40 @@ then that whitespace will be ignored (this makes the blocks easier to read in pl
 The block must end with three backticks indented at the same level than the opening
 backticks.
 
+### GITHUB SYNTAX HIGHLIGHTING
+
+As an extra feature, you can syntax highlight a file from your repository, allowing
+you keep some of your sample code in the main repository. The code-snippet is
+updated when the wiki is rebuilt. You include github code like this:
+
+    ```html:github/gollum/master/test/file_view/1_file.txt```
+
+This will make the builder look at the **github user**, in the **gollum project**,
+in the **master branch**, at path **test/file_view/1_file.txt**. It will be
+rewritten to:
+
+    ```html
+    <ol class="tree">
+      <li class="file"><a href="0">0</a></li>
+    </ol>
+    ```
+
+Which will be parsed as HTML code during the Pygments run, and thereby coloured 
+appropriately.
+
 ## MATHEMATICAL EQUATIONS
 
+Start gollum with the `--mathjax` flag. Read more about [MathJax](http://docs.mathjax.org/en/latest/index.html) on the web. Gollum uses the `TeX-AMS-MML_HTMLorMML` config with the `autoload-all` extension.
 
-Page files may contain mathematic equations in TeX syntax that will be nicely
-typeset into the expected output. A block-style equation is delimited by `\[`
-and `\]`. For example:
+Inline math:
 
-    \[ P(E) = {n \choose k} p^k (1-p)^{ n-k} \]
+- $2^2$
+- `\\(2^2\\)`
 
-Inline equations are delimited by `\(` and `\)`. These equations will appear
-inline with regular text. For example:
+Display math:
 
-    The Pythagorean theorem is \( a^2 + b^2 = c^2 \).
-
-### INSTALLATION REQUIREMENTS
-
-In order to get the mathematical equations rendering to work, you need the following binaries:
-
-* LaTex, TeTex or MacTex/BasicTeX (pdflatex)
-* Netpbm (pnmcrop, pnmpad, pnmscale, ppmtopgm, pnmgamma, pnmtopng)
-* Ghostscript (gs)
+- $$2^2$$
+- [2^2]
 
 ## SEQUENCE DIAGRAMS
 
@@ -362,10 +381,10 @@ You may imbed sequence diagrams into your wiki page (rendered by
 [WebSequenceDiagrams](http://www.websequencediagrams.com) by using the
 following syntax:
 
-    {{{ blue-modern
+    {{{{{{ blue-modern
       alice->bob: Test
       bob->alice: Test response
-    }}}
+    }}}}}}
 
 You can replace the string "blue-modern" with any supported style.
 
@@ -391,6 +410,17 @@ Initialize the Gollum::Repo object:
 By default, internal wiki links are all absolute from the root. To specify a different base path, you can specify the `:base_path` option:
 
     wiki = Gollum::Wiki.new("my-gollum-repo.git", :base_path => "/wiki")
+
+Note that base_path just modifies the links. To map gollum to a non-root location:
+
+- Use the gollum binary: `gollum path/to/wiki --base-path mywiki`
+- Define config.ru with `map`. See [#532](https://github.com/github/gollum/issues/532) for an example.
+
+> :base_path     - String base path for all Wiki links.
+>
+> The String base path to prefix to internal links. For example, when set
+> to "/wiki", the page "Hobbit" will be linked as "/wiki/Hobbit". Defaults
+> to "/".
 
 Get the latest version of the given human or canonical page name:
 
@@ -497,8 +527,22 @@ like Rack::Auth, OmniAuth, etc.
     Precious::App.set(:wiki_options, {:universal_toc => false})
     run Precious::App
 
-## Windows Filename Validation
+Your Rack middleware can pass author details to Gollum in a Hash in the session under the 'gollum.author' key.
+
+## WINDOWS FILENAME VALIDATION
 Note that filenames on windows must not contain any of the following characters `\ / : * ? " < > |`. See [this support article](http://support.microsoft.com/kb/177506) for details.
+
+## CONFIG FILE
+
+Gollum optionally takes a `--config file`. See [config.rb](https://github.com/github/gollum/blob/master/config.rb) for an example.
+
+## CUSTOM CSS
+
+The `--css` flag will inject `custom.css` from the root of your git repository into each page. Here's an example of floating the sidebar to the left.
+
+```css
+#wiki-rightbar { float: left !important; }
+```
 
 ## CONTRIBUTE
 
@@ -520,16 +564,20 @@ your changes merged back into core is as follows:
 1. Send a pull request to the github/gollum project.
 
 ## RELEASING
+    x.y.z
+
+    For z releases:
+    $ rake bump
+    $ rake release
+
+    For x.y releases:
     Update VERSION in lib/gollum.rb
     $ rake gemspec
-    $ git tag vX.Y.Z
-    $ git push origin vX.Y.Z
-    $ gem build gollum.gemspec
-    $ gem push gollum-X.Y.Z.gem
+    $ rake release
     
 ## BUILDING THE GEM FROM MASTER
-    $ gem uninstall -aix gollum
+    $ gem uninstall -aIx gollum
     $ git clone https://github.com/github/gollum.git
     $ cd gollum
     gollum$ rake build
-    gollum$ gem install pkg/gollum*.gem
+    gollum$ gem install --no-ri --no-rdoc pkg/gollum*.gem

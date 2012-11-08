@@ -63,7 +63,14 @@ end
 #
 #############################################################################
 
-
+desc "Update version number and gemspec"
+task :bump do
+  puts "Updated version to #{bump_version}"
+  # Execute does not invoke dependencies.
+  # Manually invoke gemspec then validate.
+  Rake::Task[:gemspec].execute
+  Rake::Task[:validate].execute
+end
 
 #############################################################################
 #
@@ -78,6 +85,7 @@ task :release => :build do
     exit!
   end
   sh "git commit --allow-empty -a -m 'Release #{version}'"
+  sh "git pull"
   sh "git tag v#{version}"
   sh "git push origin master"
   sh "git push origin v#{version}"
