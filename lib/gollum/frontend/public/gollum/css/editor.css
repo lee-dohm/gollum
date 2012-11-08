@@ -243,12 +243,12 @@ a#function-help:hover span { background-position: -405px -28px; }
   background: #fff;
   border: 1px solid #ddd;
   font-size: 1em;
-  font-family: 'Anonymous Pro', 'Courier New', Courier, monospace;
+  font-family: monospace;
   line-height: 1.4em;
   margin: 1em 0 0.4em;
   padding: 0.5em;
   width: 98%;
-  height: 20em;
+  height: 40em;
 }
 
 #gollum-editor input#gollum-editor-submit {
