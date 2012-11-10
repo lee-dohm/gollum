@@ -1,6 +1,7 @@
 require 'rubygems'
 require 'rake'
 require 'date'
+require 'gollum/version'
 
 #############################################################################
 #
@@ -13,8 +14,7 @@ def name
 end
 
 def version
-  line = File.read("lib/#{name}.rb")[/^\s*VERSION\s*=\s*.*/]
-  line.match(/.*VERSION\s*=\s*['"](.*)['"]/)[1]
+  Gollum::VERSION
 end
 
 def rubyforge_project
