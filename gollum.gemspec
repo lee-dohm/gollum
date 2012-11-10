@@ -1,9 +1,6 @@
 
-lib = File.expand_path('../lib/', __FILE__)
-$LOAD_PATH.unshift lib unless $LOAD_PATH.include?(lib)
-
 require 'date'
-require 'gollum'
+require File.expand_path('../lib/gollum/version', __FILE__)
 
 Gem::Specification.new do |s|
   s.specification_version = 2 if s.respond_to? :specification_version=
