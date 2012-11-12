@@ -27,7 +27,7 @@ module Precious
       end
 
       def date
-        page_versions = @page.versions
+        page_versions = @page.versions(:per_page => 1)
         first = page_versions ? page_versions.first : false
         return Time.now.strftime(DATE_FORMAT) unless first
         first.authored_date.strftime(DATE_FORMAT)
