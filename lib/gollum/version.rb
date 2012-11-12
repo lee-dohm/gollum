@@ -3,5 +3,5 @@
 #
 
 module Gollum
-  VERSION = '2.3.12'
+  VERSION = '2.4.0'
 end

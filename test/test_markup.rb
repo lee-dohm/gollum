@@ -657,7 +657,7 @@ np.array([[2,2],[1,3]],np.float)
     page = @wiki.page("Bilbo Baggins")
     rendered = Gollum::Markup.new(page).render
     assert_equal output, rendered 
-    assert_equal result, page.meta_data
+    assert_equal result, page.metadata
   end
 
   test "metadata blocks with newline" do
@@ -672,7 +672,7 @@ np.array([[2,2],[1,3]],np.float)
     page = @wiki.page("Bilbo Baggins")
     rendered = Gollum::Markup.new(page).render
     assert_equal output, rendered 
-    assert_equal result, page.meta_data
+    assert_equal result, page.metadata
   end
 
   test "metadata sanitation" do
@@ -687,7 +687,7 @@ np.array([[2,2],[1,3]],np.float)
     page = @wiki.page("Bilbo Baggins")
     rendered = Gollum::Markup.new(page).render
     assert_equal output, rendered 
-    assert_equal result, page.meta_data
+    assert_equal result, page.metadata
   end
 
   #########################################################################
