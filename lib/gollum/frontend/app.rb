@@ -131,7 +131,7 @@ module Precious
           redirect to(live_preview_url)
         else
           @page = page
-          @page.version = wiki.repo.log(wiki.ref, @page.path).first
+          @page.version = wiki.repo.log(wiki.ref, @page.path, :max_count => 1)
           raw_data = page.raw_data
           @content = raw_data.respond_to?(:force_encoding) ? raw_data.force_encoding('UTF-8') : raw_data
           mustache :edit
